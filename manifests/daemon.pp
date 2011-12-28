@@ -19,7 +19,7 @@ class git::daemon {
   service{'git-daemon':
     hasstatus => true,
   }
-  if $git_daemon == 'service' {
+  if hiera('git_daemon',true) == 'service' {
     Xinetd::File['git']{
       source => "puppet:///modules/git/xinetd.d/git.disabled"
     }
@@ -38,7 +38,7 @@ class git::daemon {
       enable => true,
       require => [ File['/etc/sysconfig/git-daemon'], File['/etc/init.d/git-daemon'] ],
     }
-  } else {
+  } elsif (hiera('git_daemon',true) != false) {
     Xinetd::File['git']{
       source => [ "puppet:///modules/site-git/xinetd.d/${fqdn}/git",
                   "puppet:///modules/site-git/xinetd.d/git",
