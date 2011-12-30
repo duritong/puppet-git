@@ -52,9 +52,13 @@ class git::daemon {
     File['/etc/init.d/git-daemon','/etc/sysconfig/git-daemon']{
       ensure => absent,
     }
+  } else {
+    Xinetd::File['git']{
+      ensure => absent,
+    }
   }
 
-  if $use_shorewall {
+  if hiera('use_shorewall',false) {
     include shorewall::rules::gitdaemon
   }
 }
