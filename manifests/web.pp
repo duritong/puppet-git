@@ -16,4 +16,12 @@ class git::web {
     require => Package['gitweb'],
     owner => root, group => 0, mode => 0644;
   }
+
+  file{"/var/www/git/robots.txt":
+    source => [ "puppet:///modules/site-git/web/${fqdn}/robots.txt",
+                "puppet:///modules/site-git/web/robots.txt",
+                "puppet:///modules/git/web/robots.txt" ],
+    require => Package['gitweb'],
+    owner => root, group => 0, mode => 0644;
+  }
 }

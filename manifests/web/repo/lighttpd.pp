@@ -11,6 +11,6 @@ define git::web::repo::lighttpd(
 
   lighttpd::vhost::file{$name:
      ensure => $ensure,
-     content => template('git/web/lighttpd');
+     content => template('git/web/lighttpd.erb');
   }
 }

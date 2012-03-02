@@ -25,7 +25,7 @@ define git::web::repo(
   file{"${gitweb_config}": }
   if $ensure == 'present' {
     File["${gitweb_config}"]{
-      content => template("git/web/config")
+      content => template("git/web/config.erb")
     }
   } else {
     File["${gitweb_config}"]{
