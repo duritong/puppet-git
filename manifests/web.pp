@@ -10,16 +10,16 @@ class git::web {
     owner => root, group => 0, mode => 0755;
   }
   file{'/etc/gitweb.conf':
-    source => [ "puppet:///modules/site-git/web/${fqdn}/gitweb.conf",
-                "puppet:///modules/site-git/web/gitweb.conf",
+    source => [ "puppet:///modules/site_git/web/${fqdn}/gitweb.conf",
+                "puppet:///modules/site_git/web/gitweb.conf",
                 "puppet:///modules/git/web/gitweb.conf" ],
     require => Package['gitweb'],
     owner => root, group => 0, mode => 0644;
   }
 
   file{"/var/www/git/robots.txt":
-    source => [ "puppet:///modules/site-git/web/${fqdn}/robots.txt",
-                "puppet:///modules/site-git/web/robots.txt",
+    source => [ "puppet:///modules/site_git/web/${fqdn}/robots.txt",
+                "puppet:///modules/site_git/web/robots.txt",
                 "puppet:///modules/git/web/robots.txt" ],
     require => Package['gitweb'],
     owner => root, group => 0, mode => 0644;
