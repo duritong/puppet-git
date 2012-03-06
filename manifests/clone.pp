@@ -19,8 +19,8 @@ define git::clone(
 ){
   case $ensure {
     absent: {
-      exec{"rm -rf $projectroot":
-        onlyif => "test -d  $projectroot",
+      exec{"rm -rf ${projectroot}":
+        onlyif => "test -d ${projectroot}",
       }
     }
     default: {
