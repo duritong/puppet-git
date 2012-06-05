@@ -24,12 +24,12 @@ class git::daemon {
       source => "puppet:///modules/git/xinetd.d/git.disabled"
     }
     File['/etc/init.d/git-daemon']{
-    source => [ "puppet:///modules/site_git/init.d/${fqdn}/git-daemon",
+    source => [ "puppet:///modules/site_git/init.d/${::fqdn}/git-daemon",
                 "puppet:///modules/site_git/init.d/git-daemon",
                 "puppet:///modules/git/init.d/git-daemon" ],
     }
     File['/etc/sysconfig/git-daemon']{
-      source => [ "puppet:///modules/site_git/sysconfig/${fqdn}/git-daemon",
+      source => [ "puppet:///modules/site_git/sysconfig/${::fqdn}/git-daemon",
                   "puppet:///modules/site_git/sysconfig/git-daemon",
                   "puppet:///modules/git/sysconfig/git-daemon" ],
     }
@@ -40,7 +40,7 @@ class git::daemon {
     }
   } elsif (hiera('git_daemon',true) != false) {
     Xinetd::File['git']{
-      source => [ "puppet:///modules/site_git/xinetd.d/${fqdn}/git",
+      source => [ "puppet:///modules/site_git/xinetd.d/${::fqdn}/git",
                   "puppet:///modules/site_git/xinetd.d/git",
                   "puppet:///modules/git/xinetd.d/git" ],
     }

@@ -22,17 +22,17 @@ define git::web::repo(
     default: { $gitweb_sitename = $sitename }
   }
   $gitweb_config = "/etc/gitweb.d/${name}.conf"
-  file{"${gitweb_config}": }
+  file{$gitweb_config: }
   if $ensure == 'present' {
-    File["${gitweb_config}"]{
+    File[$gitweb_config]{
       content => template("git/web/config.erb")
     }
   } else {
-    File["${gitweb_config}"]{
+    File[gitweb_config]{
       ensure => absent,
     }
   }
-  case $gitweb_webserver {
+  case hiera('gitweb_webserver','none') {
     'lighttpd': {
       git::web::repo::lighttpd{$name:
         ensure => $ensure,
@@ -49,7 +49,7 @@ define git::web::repo(
     }
     default: {
       if ($ensure == 'present') {
-        fail("no supported \$gitweb_webserver defined on ${fqdn}, so can't do git::web::repo: ${name}")
+        fail("no supported gitweb_webserver defined on ${::fqdn}, so can't do git::web::repo: ${name}")
       }
     }
   }

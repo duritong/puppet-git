@@ -19,7 +19,7 @@ class git::daemon::disable inherits git::daemon {
     before => File['/etc/init.d/git-daemon'],
   }
 
-  if $use_shorewall {
+  if hiera('use_shorewall',false) {
     include shorewall::rules::gitdaemon::absent
   }
 }
