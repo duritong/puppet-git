@@ -28,7 +28,7 @@ define git::web::repo(
       content => template("git/web/config.erb")
     }
   } else {
-    File[gitweb_config]{
+    File[$gitweb_config]{
       ensure => absent,
     }
   }
