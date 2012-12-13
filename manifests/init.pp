@@ -11,8 +11,9 @@
 # the Free Software Foundation.
 #
 
+# manage git in general
 class git {
-  include git::base
+  require git::base
 
   if hiera('use_shorewall',false) {
     include shorewall::rules::out::git

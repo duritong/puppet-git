@@ -1,5 +1,6 @@
+# install git
 class git::base {
-    package{'git':
-        ensure => present,
-    }
+  package{'git':
+    ensure => present,
+  }
 }

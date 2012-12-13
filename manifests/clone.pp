@@ -28,8 +28,8 @@ define git::clone(
       exec {"git-clone_${name}":
         command => "git clone --no-hardlinks ${git_repo} ${projectroot}",
         creates => "${projectroot}/.git",
-        user => root,
-        notify => Exec["git-clone-chown_${name}"],
+        user    => root,
+        notify  => Exec["git-clone-chown_${name}"],
       }
       if $clone_before != 'absent' {
         Exec["git-clone_${name}"]{
@@ -38,21 +38,21 @@ define git::clone(
       }
       if $submodules {
         exec{"git-submodules_${name}":
-          command => "git submodule init && git submodule update",
-          cwd => $projectroot,
+          command     => 'git submodule init && git submodule update',
+          cwd         => $projectroot,
           refreshonly => true,
-          subscribe => Exec["git-clone_${name}"],
+          subscribe   => Exec["git-clone_${name}"],
         }
       }
       exec {"git-clone-chown_${name}":
-        command => "chown -R ${cloneddir_user}:${cloneddir_group} ${projectroot};chmod -R og-rwx ${projectroot}/.git",
+        command     => "chown -R ${cloneddir_user}:${cloneddir_group} ${projectroot};chmod -R og-rwx ${projectroot}/.git",
         refreshonly => true
       }
       if $cloneddir_restrict_mode {
         exec {"git-clone-chmod_${name}":
-          command => "chmod -R o-rwx ${projectroot}",
+          command     => "chmod -R o-rwx ${projectroot}",
           refreshonly => true,
-          subscribe => Exec["git-clone_${name}"],
+          subscribe   => Exec["git-clone_${name}"],
         }
       }
     }
