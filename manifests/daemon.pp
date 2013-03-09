@@ -1,3 +1,4 @@
+# basic git-daemon setup
 class git::daemon(
   $use_shorewall = false,
 ) {
