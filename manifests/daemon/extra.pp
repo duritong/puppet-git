@@ -1,0 +1,58 @@
+class git::daemon::extra {
+  include git::daemon
+  class{'git::daemon':
+    use_shorewall => hiera('use_shorewall',false)
+  }
+  xinetd::file{'git':
+    require => Package['git-daemon'],
+  }
+  file{'/etc/init.d/git-daemon':
+    require => Package['git-daemon'],
+    owner => root, group => 0, mode => 0755;
+  }
+  file{'/etc/sysconfig/git-daemon':
+    require => Package['git-daemon'],
+    owner => root, group => 0, mode => 0644;
+  }
+  service{'git-daemon':
+    hasstatus => true,
+  }
+  if hiera('git_daemon',true) == 'service' {
+    Xinetd::File['git']{
+      source => "puppet:///modules/git/xinetd.d/git.disabled"
+    }
+    File['/etc/init.d/git-daemon']{
+    source => [ "puppet:///modules/site_git/init.d/${::fqdn}/git-daemon",
+                "puppet:///modules/site_git/init.d/git-daemon",
+                "puppet:///modules/git/init.d/git-daemon" ],
+    }
+    File['/etc/sysconfig/git-daemon']{
+      source => [ "puppet:///modules/site_git/sysconfig/${::fqdn}/git-daemon",
+                  "puppet:///modules/site_git/sysconfig/git-daemon",
+                  "puppet:///modules/git/sysconfig/git-daemon" ],
+    }
+    Service['git-daemon']{
+      ensure => running,
+      enable => true,
+      require => [ File['/etc/sysconfig/git-daemon'], File['/etc/init.d/git-daemon'] ],
+    }
+  } elsif (hiera('git_daemon',true) != false) {
+    Xinetd::File['git']{
+      source => [ "puppet:///modules/site_git/xinetd.d/${::fqdn}/git",
+                  "puppet:///modules/site_git/xinetd.d/git",
+                  "puppet:///modules/git/xinetd.d/git" ],
+    }
+    Service['git-daemon']{
+      ensure => stopped,
+      enable => false,
+      before => [ File['/etc/sysconfig/git-daemon'], File['/etc/init.d/git-daemon'] ],
+    }
+    File['/etc/init.d/git-daemon','/etc/sysconfig/git-daemon']{
+      ensure => absent,
+    }
+  } else {
+    Xinetd::File['git']{
+      ensure => absent,
+    }
+  }
+}
