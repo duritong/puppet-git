@@ -1,6 +1,7 @@
 # extra things for a git-daemon
 class git::daemon::extra(
-  $source = undef
+  $use_shorewall = false,
+  $source        = undef
 ) inherits git::daemon {
   xinetd::file{'git':
     require => Package['git-daemon'],
