@@ -1,6 +1,6 @@
 # basic git-daemon setup
 class git::daemon(
-  $use_shorewall = false,
+  $use_shorewall = false
 ) {
   require git
   package{'git-daemon':
