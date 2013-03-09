@@ -1,6 +1,6 @@
 # extra things for a git-daemon
 class git::daemon::extra(
-  $source = undef,
+  $source = undef
 ) inherits git::daemon {
   xinetd::file{'git':
     require => Package['git-daemon'],
