@@ -1,5 +1,7 @@
 # extra things for a git-daemon
-class git::daemon::extra inherits git::daemon {
+class git::daemon::extra(
+  $source = undef,
+) inherits git::daemon {
   xinetd::file{'git':
     require => Package['git-daemon'],
   }
@@ -23,14 +25,17 @@ class git::daemon::extra inherits git::daemon {
       source => 'puppet:///modules/git/xinetd.d/git.disabled'
     }
     File['/etc/init.d/git-daemon']{
-    source => [ "puppet:///modules/site_git/init.d/${::fqdn}/git-daemon",
-                'puppet:///modules/site_git/init.d/git-daemon',
-                'puppet:///modules/git/init.d/git-daemon' ],
+      source => [ "puppet:///modules/site_git/init.d/${::fqdn}/git-daemon",
+                  'puppet:///modules/site_git/init.d/git-daemon',
+                  'puppet:///modules/git/init.d/git-daemon' ],
     }
     File['/etc/sysconfig/git-daemon']{
-      source => [ "puppet:///modules/site_git/sysconfig/${::fqdn}/git-daemon",
-                  'puppet:///modules/site_git/sysconfig/git-daemon',
-                  'puppet:///modules/git/sysconfig/git-daemon' ],
+      source => $source ? {
+        undef   => [  "puppet:///modules/site_git/sysconfig/${::fqdn}/git-daemon",
+                      'puppet:///modules/site_git/sysconfig/git-daemon',
+                      'puppet:///modules/git/sysconfig/git-daemon' ],
+        default => $source
+      }
     }
     Service['git-daemon']{
       ensure  => running,
@@ -39,9 +44,12 @@ class git::daemon::extra inherits git::daemon {
     }
   } elsif (hiera('git_daemon',true) != false) {
     Xinetd::File['git']{
-      source => [ "puppet:///modules/site_git/xinetd.d/${::fqdn}/git",
-                  'puppet:///modules/site_git/xinetd.d/git',
-                  'puppet:///modules/git/xinetd.d/git' ],
+      source => $source ? {
+        undef   => [  "puppet:///modules/site_git/xinetd.d/${::fqdn}/git",
+                      'puppet:///modules/site_git/xinetd.d/git',
+                      'puppet:///modules/git/xinetd.d/git' ],
+        default => $source
+      }
     }
     Service['git-daemon']{
       ensure => stopped,
