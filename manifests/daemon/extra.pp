@@ -1,9 +1,5 @@
 # extra things for a git-daemon
-class git::daemon::extra {
-  include git::daemon
-  class{'git::daemon':
-    use_shorewall => hiera('use_shorewall',false)
-  }
+class git::daemon::extra inherits git::daemon {
   xinetd::file{'git':
     require => Package['git-daemon'],
   }
