@@ -8,14 +8,14 @@
 #               dependency cycle if you manage $projectroot
 #               somewhere else.
 define git::clone(
-  $ensure = present,
   $git_repo,
   $projectroot,
-  $submodules = false,
-  $clone_before = 'absent',
-  $cloneddir_user='root',
-  $cloneddir_group='0',
-  $cloneddir_restrict_mode=true
+  $ensure                   = present,
+  $submodules               = false,
+  $clone_before             = 'absent',
+  $cloneddir_user           ='root',
+  $cloneddir_group          ='0',
+  $cloneddir_restrict_mode  = true,
 ){
   case $ensure {
     absent: {
