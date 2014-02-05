@@ -28,7 +28,7 @@ define git::clone(
       exec {"git-clone_${name}":
         command => "git clone --no-hardlinks ${git_repo} ${projectroot}",
         creates => "${projectroot}/.git",
-        user    => root,
+        user    => $cloneddir_user,
         notify  => Exec["git-clone-chown_${name}"],
       }
       if $clone_before != 'absent' {
@@ -40,8 +40,14 @@ define git::clone(
         exec{"git-submodules_${name}":
           command     => 'git submodule init && git submodule update',
           cwd         => $projectroot,
+          user        => $cloneddir_user,
           refreshonly => true,
           subscribe   => Exec["git-clone_${name}"],
+        }
+        if $cloneddir_restrict_mode {
+          Exec["git-submodules_${name}"]{
+            before => Exec["git-clone-chown_${name}"],
+          }
         }
       }
       exec {"git-clone-chown_${name}":
@@ -53,6 +59,7 @@ define git::clone(
           command     => "chmod -R o-rwx ${projectroot}",
           refreshonly => true,
           subscribe   => Exec["git-clone_${name}"],
+          require     => Exec["git-clone-chown_${name}"],
         }
       }
     }
