@@ -28,7 +28,7 @@ define git::clone(
       exec {"git-clone_${name}":
         command => "git clone --no-hardlinks ${git_repo} ${projectroot}",
         creates => "${projectroot}/.git",
-        user    => $cloneddir_user,
+        user    => root, # we want to clone as root, rename comes later
         notify  => Exec["git-clone-chown_${name}"],
       }
       if $clone_before != 'absent' {
