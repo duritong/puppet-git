@@ -52,25 +52,27 @@ define git::clone(
           }
         }
       }
+
+      exec {"git-clone-chown_${name}":
+        command     => "chown -R ${cloneddir_user}:${cloneddir_group} ${projectroot};chmod -R og-rwx ${projectroot}/.git",
+        refreshonly => true,
+        before      => Anchor["git::clone::${name}::finished"],
+      }
+
       if $submodules {
         exec{"git-submodules_${name}":
           command     => 'git submodule init && git submodule update',
           cwd         => $projectroot,
           user        => $cloneddir_user,
           refreshonly => true,
-          subscribe   => Exec["git-clone_${name}"],
-          notify      => Exec["git-clone-chown_${name}"],
+          subscribe   => [ Exec["git-clone_${name}"], Exec["git-clone-chown_${name}"] ],
+          before      => Exec["git-clone-chmod_${name}"];
         }
         if $branch {
           Exec["git-submodules_${name}"]{
             require => Exec["git_branch_${name}"]
           }
         }
-      }
-      exec {"git-clone-chown_${name}":
-        command     => "chown -R ${cloneddir_user}:${cloneddir_group} ${projectroot};chmod -R og-rwx ${projectroot}/.git",
-        refreshonly => true,
-        before      => Anchor["git::clone::${name}::finished"],
       }
       if $cloneddir_restrict_mode {
         exec {"git-clone-chmod_${name}":
