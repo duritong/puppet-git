@@ -11,6 +11,7 @@ define git::clone(
   $git_repo,
   $projectroot,
   $ensure                   = present,
+  $branch                   = false,
   $submodules               = false,
   $clone_before             = 'absent',
   $cloneddir_user           ='root',
@@ -21,6 +22,7 @@ define git::clone(
     absent: {
       exec{"rm -rf ${projectroot}":
         onlyif => "test -d ${projectroot}",
+        before => Anchor["git::clone::${name}::finished"],
       }
     }
     default: {
@@ -31,9 +33,23 @@ define git::clone(
         user    => root, # we want to clone as root, rename comes later
         notify  => Exec["git-clone-chown_${name}"],
       }
+      if $branch {
+        exec{"git_branch_${name}":
+          command => "git checkout ${branch}",
+          cwd     => $projectroot,
+          unless  => "git branch | grep -Eq '^\* ${branch}$'",
+          require => Exec["git-clone_${name}"],
+          notify  => Exec["git-clone-chown_${name}"],
+        }
+      }
       if $clone_before != 'absent' {
         Exec["git-clone_${name}"]{
           before => $clone_before,
+        }
+        if $branch {
+          Exec["git_branch_${name}"]{
+            before => $clone_before,
+          }
         }
       }
       if $submodules {
@@ -43,25 +59,28 @@ define git::clone(
           user        => $cloneddir_user,
           refreshonly => true,
           subscribe   => Exec["git-clone_${name}"],
+          notify      => Exec["git-clone-chown_${name}"],
         }
-        if $cloneddir_restrict_mode {
+        if $branch {
           Exec["git-submodules_${name}"]{
-            before => Exec["git-clone-chown_${name}"],
+            require => Exec["git_branch_${name}"]
           }
         }
       }
       exec {"git-clone-chown_${name}":
         command     => "chown -R ${cloneddir_user}:${cloneddir_group} ${projectroot};chmod -R og-rwx ${projectroot}/.git",
-        refreshonly => true
+        refreshonly => true,
+        before      => Anchor["git::clone::${name}::finished"],
       }
       if $cloneddir_restrict_mode {
         exec {"git-clone-chmod_${name}":
           command     => "chmod -R o-rwx ${projectroot}",
           refreshonly => true,
           subscribe   => Exec["git-clone_${name}"],
-          require     => Exec["git-clone-chown_${name}"],
+          before      => Anchor["git::clone::${name}::finished"],
         }
       }
     }
   }
+  anchor{"git::clone::${name}::finished": }
 }
