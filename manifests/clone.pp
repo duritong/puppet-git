@@ -65,8 +65,8 @@ define git::clone(
           cwd         => $projectroot,
           user        => $cloneddir_user,
           refreshonly => true,
+          before      => Anchor["git::clone::${name}::finished"],
           subscribe   => [ Exec["git-clone_${name}"], Exec["git-clone-chown_${name}"] ],
-          before      => Exec["git-clone-chmod_${name}"];
         }
         if $branch {
           Exec["git-submodules_${name}"]{
@@ -80,6 +80,11 @@ define git::clone(
           refreshonly => true,
           subscribe   => Exec["git-clone_${name}"],
           before      => Anchor["git::clone::${name}::finished"],
+        }
+        if $submodules {
+          Exec["git-clone-chmod_${name}"]{
+            require => Exec["git-submodules_${name}"]
+          }
         }
       }
     }
