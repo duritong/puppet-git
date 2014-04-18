@@ -37,7 +37,7 @@ define git::clone(
         exec{"git_branch_${name}":
           command => "git checkout ${branch}",
           cwd     => $projectroot,
-          unless  => "git branch | grep -Eq '^\* ${branch}$'",
+          unless  => "git branch | grep -Eq '^\\* ${branch}$'",
           require => Exec["git-clone_${name}"],
           notify  => Exec["git-clone-chown_${name}"],
         }
