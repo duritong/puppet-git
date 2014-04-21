@@ -34,6 +34,7 @@ define git::clone(
         creates => "${projectroot}/.git",
         user    => $clone_as_user,
         group   => $clone_as_group,
+        cwd     => dirname($projectroot),
         notify  => Exec["git-clone-chown_${name}"],
       }
       if $branch {
