@@ -14,8 +14,10 @@ define git::clone(
   $branch                   = false,
   $submodules               = false,
   $clone_before             = 'absent',
-  $cloneddir_user           ='root',
-  $cloneddir_group          ='0',
+  $clone_as_user            = 'root',
+  $cloneddir_user           = 'root',
+  $clone_as_group           = 0,
+  $cloneddir_group          = 0,
   $cloneddir_restrict_mode  = true,
 ){
   case $ensure {
@@ -30,7 +32,8 @@ define git::clone(
       exec {"git-clone_${name}":
         command => "git clone --no-hardlinks ${git_repo} ${projectroot}",
         creates => "${projectroot}/.git",
-        user    => root, # we want to clone as root, rename comes later
+        user    => $clone_as_user,
+        group   => $clone_as_group,
         notify  => Exec["git-clone-chown_${name}"],
       }
       if $branch {
@@ -64,6 +67,7 @@ define git::clone(
           command     => 'git submodule init && git submodule update',
           cwd         => $projectroot,
           user        => $cloneddir_user,
+          group       => $cloneddir_group,
           refreshonly => true,
           before      => Anchor["git::clone::${name}::finished"],
           subscribe   => [ Exec["git-clone_${name}"], Exec["git-clone-chown_${name}"] ],
