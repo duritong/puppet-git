@@ -10,16 +10,16 @@
 define git::clone(
   $git_repo,
   $projectroot,
-  $ensure                   = present,
-  $branch                   = false,
-  $submodules               = false,
-  $submodule_timeout        = 600,
-  $clone_before             = 'absent',
-  $clone_as_user            = 'root',
-  $cloneddir_user           = 'root',
-  $clone_as_group           = 0,
-  $cloneddir_group          = 0,
-  $cloneddir_restrict_mode  = true,
+  $ensure                  = present,
+  $branch                  = false,
+  $submodules              = false,
+  $submodule_timeout       = 600,
+  $clone_before            = 'absent',
+  $clone_as_user           = 'root',
+  $cloneddir_user          = 'root',
+  $clone_as_group          = 0,
+  $cloneddir_group         = 0,
+  $cloneddir_restrict_mode = true,
 ){
   case $ensure {
     absent: {
@@ -38,6 +38,7 @@ define git::clone(
         cwd     => dirname($projectroot),
         notify  => Exec["git-clone-chown_${name}"],
       }
+      Exec["git-clone_${name}"] -> File<| title == $projectroot |>
       if $branch {
         exec{"git_branch_${name}":
           command => "git checkout ${branch}",
