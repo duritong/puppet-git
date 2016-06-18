@@ -38,6 +38,7 @@ define git::clone(
         cwd     => dirname($projectroot),
         notify  => Exec["git-clone-chown_${name}"],
       }
+      Exec["git-clone_${name}"] -> File<| title == $projectroot |>
       if $branch {
         exec{"git_branch_${name}":
           command => "git checkout ${branch}",
@@ -96,5 +97,5 @@ define git::clone(
       }
     }
   }
-  anchor{"git::clone::${name}::finished": } -> File<| title == $projectroot |>
+  anchor{"git::clone::${name}::finished": }
 }
