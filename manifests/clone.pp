@@ -22,7 +22,7 @@ define git::clone(
   $cloneddir_restrict_mode = true,
 ){
   case $ensure {
-    absent: {
+    'absent': {
       exec{"rm -rf ${projectroot}":
         onlyif => "test -d ${projectroot}",
         before => Anchor["git::clone::${name}::finished"],
