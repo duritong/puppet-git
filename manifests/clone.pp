@@ -20,6 +20,7 @@ define git::clone(
   $clone_as_group          = 0,
   $cloneddir_group         = 0,
   $cloneddir_restrict_mode = true,
+  $restorecon              = str2bool($selinux),
 ){
   case $ensure {
     'absent': {
@@ -93,6 +94,13 @@ define git::clone(
           Exec["git-clone-chmod_${name}"]{
             require => Exec["git-submodules_${name}"]
           }
+        }
+      }
+      if $restorecon {
+        exec{"restorecon -R ${projectroot}":
+          refreshonly => true,
+          subscribe   => Exec["git-clone_${name}"],
+          before      => Anchor["git::clone::${name}::finished"],
         }
       }
     }
