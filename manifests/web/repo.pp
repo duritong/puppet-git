@@ -25,7 +25,7 @@ define git::web::repo(
   file{$gitweb_config: }
   if $ensure == 'present' {
     File[$gitweb_config]{
-      content => template("git/web/config.erb")
+      content => template('git/web/config.erb')
     }
   } else {
     File[$gitweb_config]{
@@ -35,16 +35,16 @@ define git::web::repo(
   case lookup('gitweb_webserver', { default_value => 'none' }) {
     'lighttpd': {
       git::web::repo::lighttpd{$name:
-        ensure => $ensure,
-        logmode => $logmode,
-        gitweb_url => $gitweb_url,
+        ensure        => $ensure,
+        logmode       => $logmode,
+        gitweb_url    => $gitweb_url,
         gitweb_config => $gitweb_config,
       }
     }
     'apache': {
       apache::vhost::gitweb{$gitweb_url:
+        ensure  => $ensure,
         logmode => $logmode,
-        ensure => $ensure,
       }
     }
     default: {
