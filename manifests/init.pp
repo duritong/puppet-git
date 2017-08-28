@@ -12,10 +12,12 @@
 #
 
 # manage git in general
-class git {
+class git(
+  $use_shorewall = false,
+) {
   require git::base
 
-  if hiera('use_shorewall',false) {
+  if $use_shorewall {
     include shorewall::rules::out::git
   }
 }

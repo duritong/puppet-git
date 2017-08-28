@@ -32,7 +32,7 @@ define git::web::repo(
       ensure => absent,
     }
   }
-  case hiera('gitweb_webserver','none') {
+  case lookup('gitweb_webserver', { default_value => 'none' }) {
     'lighttpd': {
       git::web::repo::lighttpd{$name:
         ensure => $ensure,
