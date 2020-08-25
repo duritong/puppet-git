@@ -22,7 +22,7 @@ define git::clone(
     $submodule_timeout       = 600,
   Optional[Integer]
     $clone_depth             = undef,
-  Optional[String]
+  Optional[Resource]
     $clone_before            = undef,
   String
     $clone_as_user           = 'root',
