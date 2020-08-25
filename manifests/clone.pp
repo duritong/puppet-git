@@ -8,19 +8,34 @@
 #               dependency cycle if you manage $projectroot
 #               somewhere else.
 define git::clone(
-  $git_repo,
-  $projectroot,
-  $ensure                  = present,
-  $branch                  = false,
-  $submodules              = false,
-  $submodule_timeout       = 600,
-  $clone_before            = 'absent',
-  $clone_as_user           = 'root',
-  $cloneddir_user          = 'root',
-  $clone_as_group          = 0,
-  $cloneddir_group         = 0,
-  $cloneddir_restrict_mode = true,
-  $restorecon              = str2bool($selinux),
+  Stdlib::HTTPSUrl
+    $git_repo,
+  Enum['present','absent']
+    $ensure                  = present,
+  Stdlib::Unixpath
+    $projectroot             = $title,
+  Optional[String]
+    $branch                  = undef,
+  Boolean
+    $submodules              = false,
+  Integer
+    $submodule_timeout       = 600,
+  Optional[Integer]
+    $clone_depth             = undef,
+  Optional[String]
+    $clone_before            = undef,
+  String
+    $clone_as_user           = 'root',
+  String
+    $cloneddir_user          = 'root',
+  Variant[String,Integer]
+    $clone_as_group          = 0,
+  Variant[String,Integer]
+    $cloneddir_group         = 0,
+  Boolean
+    $cloneddir_restrict_mode = true,
+  Boolean
+    $restorecon              = str2bool($selinux),
 ){
   case $ensure {
     'absent': {
@@ -30,9 +45,15 @@ define git::clone(
       }
     }
     default: {
-      require ::git
+      if $clone_depth {
+        $clone_depth_cmd = "--depth ${clone_depth} "
+      } else {
+        $clone_depth_cmd = ''
+      }
+      require git
+      $clone_command = "git clone --no-hardlinks ${clone_depth_cmd}${git_repo} ${projectroot}"
       exec {"git-clone_${name}":
-        command => "git clone --no-hardlinks ${git_repo} ${projectroot}",
+        command => $clone_command,
         creates => "${projectroot}/.git",
         user    => $clone_as_user,
         group   => $clone_as_group,
