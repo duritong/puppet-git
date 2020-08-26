@@ -8,7 +8,7 @@
 #               dependency cycle if you manage $projectroot
 #               somewhere else.
 define git::clone(
-  Stdlib::HTTPSUrl
+  Variant[Stdlib::HTTPSUrl,Pattern[/^.+@.+:.+\.git$/]]
     $git_repo,
   Enum['present','absent']
     $ensure                  = present,
